@@ -1,4 +1,4 @@
-# SportSight-Sports-Performance-Analytics-Platform
+# SportSight
 
 Une plateforme complète d’analyse sportive (end-to-end) utilisant SQL, dbt, Python et Power BI / Streamlit.  
 SportSight ingère des données de matchs et de joueurs, les transforme proprement, génère des métriques avancées (xG, KPIs joueurs/équipes, tendance de forme…), et expose des visualisations interactives ainsi qu’une API légère.
