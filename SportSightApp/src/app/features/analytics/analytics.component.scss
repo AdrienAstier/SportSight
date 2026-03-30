@@ -1,0 +1,14 @@
+.foot-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+.progress-bar {
+  height: 6px; background: var(--color-surface-700); border-radius: 3px; overflow: hidden;
+}
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.charts-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+.chart-title { font-size: 0.9rem; font-weight: 600; color: var(--color-text); margin: 0 0 1rem; }

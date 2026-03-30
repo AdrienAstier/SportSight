@@ -1,0 +1,77 @@
+<div class="page-enter">
+  <div class="page-header">
+    <h1>Joueurs</h1>
+    <p>{{ filteredPlayers().length }} joueur(s) trouvé(s)</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="card filters-bar mb-6">
+    <div class="filters-grid">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" class="input pl-10" placeholder="Rechercher un joueur, équipe, pays..."
+          [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
+      </div>
+      <select class="input" [ngModel]="selectedPosition()" (ngModelChange)="selectedPosition.set($event)">
+        <option value="">Tous les postes</option>
+        @for (pos of positions(); track pos) { <option [value]="pos">{{ pos }}</option> }
+      </select>
+      <select class="input" [ngModel]="selectedFoot()" (ngModelChange)="selectedFoot.set($event)">
+        <option value="">Pied préféré</option>
+        <option value="left">Gauche</option>
+        <option value="right">Droit</option>
+        <option value="both">Les deux</option>
+      </select>
+      @if (searchQuery() || selectedPosition() || selectedFoot()) {
+        <button class="btn-ghost" (click)="clearFilters()">Réinitialiser</button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner label="Chargement des joueurs..." />
+  } @else if (error()) {
+    <div class="card text-center py-12">
+      <p class="text-red-400">{{ error() }}</p>
+    </div>
+  } @else if (filteredPlayers().length === 0) {
+    <div class="card text-center py-12">
+      <p class="text-slate-400 mb-3">Aucun joueur ne correspond aux filtres</p>
+      <button class="btn-ghost" (click)="clearFilters()">Effacer les filtres</button>
+    </div>
+  } @else {
+    <div class="card">
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th>Joueur</th><th>Poste</th><th>Équipe</th><th>Nationalité</th>
+            <th>Âge</th><th>Pied</th><th>Taille</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of filteredPlayers(); track p.id) {
+            <tr>
+              <td>
+                <div class="player-cell">
+                  <div class="av">{{ p.firstName[0] }}{{ p.lastName[0] }}</div>
+                  <span class="font-medium text-white">{{ p.firstName }} {{ p.lastName }}</span>
+                </div>
+              </td>
+              <td><span class="badge-blue">{{ p.position?.name ?? '—' }}</span></td>
+              <td class="text-slate-300">{{ p.team?.name ?? '—' }}</td>
+              <td class="text-slate-300">{{ p.country?.name ?? '—' }}</td>
+              <td class="text-slate-400">{{ getAge(p.birthdate) }} ans</td>
+              <td class="text-slate-400 capitalize">{{ p.preferredFoot ?? '—' }}</td>
+              <td class="text-slate-400">{{ p.height ? p.height + ' cm' : '—' }}</td>
+              <td>
+                <a [routerLink]="['/players', p.id]" class="btn-ghost text-xs py-1 px-2">Voir →</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

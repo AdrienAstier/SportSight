@@ -1,0 +1,82 @@
+<div class="auth-page">
+  <!-- Form Panel -->
+  <div class="auth-panel">
+    <div class="auth-logo">
+      <img src="logo-icon.svg" alt="SportSight" class="auth-logo-icon" />
+      <span>SportSight</span>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <h1>Bienvenue</h1>
+        <p>Connectez-vous pour accéder à vos analyses sportives</p>
+      </div>
+
+      @if (error()) {
+        <div class="error-alert">{{ error() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="form-group">
+          <label class="label" for="username">Nom d'utilisateur</label>
+          <input id="username" type="text" class="input" formControlName="username"
+            placeholder="admin" autocomplete="username"
+            [class.input-error]="username.invalid && username.touched" />
+          @if (username.invalid && username.touched) {
+            <p class="field-error">Requis (min. 3 caractères)</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="password">Mot de passe</label>
+          <div class="input-wrapper">
+            <input id="password" [type]="showPassword() ? 'text' : 'password'" class="input"
+              formControlName="password" placeholder="••••••••" autocomplete="current-password"
+              [class.input-error]="password.invalid && password.touched" />
+            <button type="button" class="eye-btn" (click)="togglePassword()">
+              @if (showPassword()) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              }
+            </button>
+          </div>
+          @if (password.invalid && password.touched) {
+            <p class="field-error">Requis (min. 8 caractères)</p>
+          }
+        </div>
+
+        <button type="submit" class="btn-primary w-full mt-2" [disabled]="loading()">
+          @if (loading()) {
+            <div class="spin"></div> Connexion...
+          } @else {
+            Se connecter
+          }
+        </button>
+      </form>
+
+      <p class="auth-switch">
+        Pas encore de compte ? <a routerLink="/auth/register">Créer un compte</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Branding Panel -->
+  <div class="auth-branding">
+    <div class="branding-content">
+      <h2>Analyse &amp; Performance Sportive</h2>
+      <p>Visualisez les statistiques, comparez les joueurs et suivez les performances de vos équipes.</p>
+      <div class="branding-stats">
+        <div class="branding-stat"><span class="val">+500</span><span class="lbl">Joueurs</span></div>
+        <div class="branding-stat"><span class="val">+50</span><span class="lbl">Équipes</span></div>
+        <div class="branding-stat"><span class="val">+2000</span><span class="lbl">Matchs</span></div>
+      </div>
+    </div>
+  </div>
+</div>

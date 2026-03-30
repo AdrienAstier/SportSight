@@ -1,0 +1,66 @@
+<div class="auth-page">
+  <div class="auth-panel">
+    <div class="auth-logo">
+      <img src="logo-icon.svg" alt="SportSight" class="auth-logo-icon" />
+      <span>SportSight</span>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <h1>Créer un compte</h1>
+        <p>Rejoignez SportSight et accédez aux analyses sportives</p>
+      </div>
+
+      @if (error()) {
+        <div class="error-alert">{{ error() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="form-group">
+          <label class="label" for="username">Nom d'utilisateur</label>
+          <input id="username" type="text" class="input" formControlName="username"
+            placeholder="mon_pseudo" autocomplete="username"
+            [class.input-error]="username.invalid && username.touched" />
+          @if (username.invalid && username.touched) {
+            <p class="field-error">3 à 50 caractères requis</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="password">Mot de passe</label>
+          <input id="password" type="password" class="input" formControlName="password"
+            placeholder="••••••••" autocomplete="new-password"
+            [class.input-error]="password.invalid && password.touched" />
+          @if (password.invalid && password.touched) {
+            <p class="field-error">Minimum 8 caractères</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="confirm">Confirmer le mot de passe</label>
+          <input id="confirm" type="password" class="input" formControlName="confirmPassword"
+            placeholder="••••••••" autocomplete="new-password" />
+        </div>
+
+        <button type="submit" class="btn-primary w-full mt-2" [disabled]="loading()">
+          @if (loading()) {
+            <div class="spin"></div> Création...
+          } @else {
+            Créer mon compte
+          }
+        </button>
+      </form>
+
+      <p class="auth-switch">
+        Déjà un compte ? <a routerLink="/auth/login">Se connecter</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="auth-branding">
+    <div class="branding-content">
+      <h2>Analyse &amp; Performance Sportive</h2>
+      <p>Visualisez les statistiques, comparez les joueurs et suivez les performances de vos équipes.</p>
+    </div>
+  </div>
+</div>

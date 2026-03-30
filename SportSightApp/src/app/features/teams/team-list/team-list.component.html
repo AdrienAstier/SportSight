@@ -1,0 +1,43 @@
+<div class="page-enter">
+  <div class="page-header">
+    <h1>Équipes</h1>
+    <p>{{ filteredTeams().length }} équipe(s) trouvée(s)</p>
+  </div>
+
+  <div class="card filters-bar mb-6">
+    <div class="filters-grid">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" class="input pl-10" placeholder="Rechercher une équipe ou un pays..."
+          [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
+      </div>
+      <select class="input" [ngModel]="selectedContinent()" (ngModelChange)="selectedContinent.set($event)">
+        <option value="">Tous les continents</option>
+        @for (c of continents(); track c) { <option [value]="c">{{ c }}</option> }
+      </select>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner label="Chargement des équipes..." />
+  } @else if (error()) {
+    <div class="card text-center py-12"><p class="text-red-400">{{ error() }}</p></div>
+  } @else {
+    <div class="teams-grid">
+      @for (team of filteredTeams(); track team.id) {
+        <a [routerLink]="['/teams', team.id]" class="team-card">
+          <div class="team-badge">{{ team.name.slice(0, 2).toUpperCase() }}</div>
+          <div class="team-info">
+            <h3>{{ team.name }}</h3>
+            <p>{{ team.country?.name ?? '—' }}</p>
+            @if (team.country?.continent?.name) {
+              <span class="badge-blue mt-1 inline-block">{{ team.country!.continent!.name }}</span>
+            }
+          </div>
+        </a>
+      }
+    </div>
+  }
+</div>

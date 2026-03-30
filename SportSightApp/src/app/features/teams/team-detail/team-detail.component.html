@@ -1,0 +1,68 @@
+<div class="page-enter">
+  @if (loading()) {
+    <app-loading-spinner label="Chargement de l'équipe..." />
+  } @else if (error()) {
+    <div class="card text-center py-12">
+      <p class="text-red-400 mb-4">{{ error() }}</p>
+      <a routerLink="/teams" class="btn-ghost">← Retour aux équipes</a>
+    </div>
+  } @else {
+    <div class="page-header">
+      <a routerLink="/teams" class="back-link">← Équipes</a>
+      <h1>{{ team()!.name }}</h1>
+      <p>{{ team()!.country?.name ?? '—' }} · {{ team()!.country?.continent?.name ?? '—' }}</p>
+    </div>
+
+    <div class="detail-layout">
+      <!-- Summary -->
+      <div class="card team-summary">
+        <div class="team-badge-lg">{{ team()!.name.slice(0, 2).toUpperCase() }}</div>
+        <h2>{{ team()!.name }}</h2>
+        <div class="info-list">
+          <div class="info-row"><span>Pays</span><strong>{{ team()!.country?.name ?? '—' }}</strong></div>
+          <div class="info-row"><span>Continent</span><strong>{{ team()!.country?.continent?.name ?? '—' }}</strong></div>
+          <div class="info-row"><span>Effectif</span><strong>{{ squad().length }} joueurs</strong></div>
+        </div>
+      </div>
+
+      <!-- Squad -->
+      <div>
+        <h3 class="section-title">Effectif par poste</h3>
+        @if (squad().length === 0) {
+          <div class="card text-center py-8">
+            <p class="text-slate-400">Aucun joueur associé à cette équipe</p>
+          </div>
+        } @else {
+          @for (entry of positionEntries(); track entry[0]) {
+            <div class="position-group">
+              <h4 class="position-label">
+                {{ entry[0] }} <span class="count">{{ entry[1].length }}</span>
+              </h4>
+              <div class="card">
+                <table class="table-base">
+                  <thead><tr><th>Joueur</th><th>Nationalité</th><th>Âge</th><th>Pied</th><th></th></tr></thead>
+                  <tbody>
+                    @for (p of entry[1]; track p.id) {
+                      <tr>
+                        <td>
+                          <div class="player-cell">
+                            <div class="av">{{ p.firstName[0] }}{{ p.lastName[0] }}</div>
+                            {{ p.firstName }} {{ p.lastName }}
+                          </div>
+                        </td>
+                        <td class="text-slate-300">{{ p.country?.name ?? '—' }}</td>
+                        <td class="text-slate-400">{{ getAge(p.birthdate) }} ans</td>
+                        <td class="text-slate-400 capitalize">{{ p.preferredFoot ?? '—' }}</td>
+                        <td><a [routerLink]="['/players', p.id]" class="btn-ghost text-xs py-1 px-2">Voir →</a></td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  }
+</div>

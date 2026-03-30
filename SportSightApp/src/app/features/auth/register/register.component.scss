@@ -1,0 +1,55 @@
+@use '../login/login.component' as *;
+
+// Inherits all login styles — same layout
+.auth-page { display: flex; min-height: 100vh; background: var(--color-bg); }
+.auth-panel {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 2rem; width: 100%;
+  @media (min-width: 1024px) { flex: 0 0 480px; }
+}
+.auth-logo { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2.5rem;
+  span { font-size: 1.25rem; font-weight: 700; color: #f1f5f9; letter-spacing: -0.02em; } }
+.auth-logo-icon { width: 40px; height: 40px; }
+.auth-card {
+  width: 100%; max-width: 400px; background: var(--color-surface);
+  border: 1px solid var(--color-border); border-radius: var(--radius);
+  padding: 2rem; box-shadow: var(--shadow);
+}
+.auth-card-header {
+  margin-bottom: 1.5rem;
+  h1 { font-size: 1.5rem; font-weight: 700; color: white; margin: 0 0 0.375rem; }
+  p  { font-size: 0.875rem; color: var(--color-text-muted); margin: 0; }
+}
+.error-alert {
+  background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.2);
+  color: #f87171; border-radius: 0.5rem; padding: 0.75rem 1rem;
+  font-size: 0.875rem; margin-bottom: 1.25rem;
+}
+.form-group { margin-bottom: 1.25rem; }
+.input-error { border-color: var(--color-danger) !important; }
+.field-error { font-size: 0.75rem; color: #f87171; margin: 0.375rem 0 0; }
+.auth-switch {
+  text-align: center; font-size: 0.875rem; color: var(--color-text-muted); margin: 1.25rem 0 0;
+  a { color: var(--color-accent); text-decoration: none; font-weight: 500;
+      &:hover { text-decoration: underline; } }
+}
+.spin {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.auth-branding {
+  display: none;
+  @media (min-width: 1024px) {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  }
+}
+.branding-content {
+  text-align: center; padding: 2rem; max-width: 400px;
+  h2 { font-size: 2rem; font-weight: 800; margin: 0 0 1rem;
+       background: linear-gradient(135deg, #fff, #93c5fd);
+       -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  > p { color: var(--color-text-muted); line-height: 1.6; margin: 0; }
+}

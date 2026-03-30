@@ -1,0 +1,82 @@
+<div class="page-enter">
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Bienvenue, <strong>{{ authService.username() }}</strong> — Vue d'ensemble de la plateforme</p>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner label="Chargement des données..." />
+  } @else {
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <app-stat-card title="Joueurs" [value]="players().length" subtitle="dans la base" variant="info" />
+      <app-stat-card title="Équipes" [value]="teams().length" subtitle="enregistrées" variant="success" />
+      <app-stat-card title="Nationalités" [value]="countries().length" subtitle="représentées" variant="warning" />
+      <app-stat-card title="Matchs analysés" value="—" subtitle="à venir" variant="default" />
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+      <div class="card">
+        <h3 class="chart-title">Joueurs par poste</h3>
+        <apx-chart
+          [series]="positionSeries()"
+          [chart]="positionOptions().chart"
+          [xaxis]="positionOptions().xaxis"
+          [plotOptions]="positionOptions().plotOptions"
+          [dataLabels]="positionOptions().dataLabels"
+          [fill]="positionOptions().fill"
+          [tooltip]="positionOptions().tooltip"
+          [grid]="positionOptions().grid"
+        />
+      </div>
+      <div class="card">
+        <h3 class="chart-title">Nationalités (Top 8)</h3>
+        @if (countrySeries().length) {
+          <apx-chart
+            [series]="countrySeries()"
+            [chart]="countryOptions().chart"
+            [labels]="countryLabels()"
+            [legend]="countryOptions().legend"
+            [dataLabels]="countryOptions().dataLabels"
+            [stroke]="countryOptions().stroke"
+            [tooltip]="countryOptions().tooltip"
+          />
+        } @else {
+          <p class="text-slate-400 text-sm text-center py-10">Aucune donnée</p>
+        }
+      </div>
+    </div>
+
+    <!-- Recent players -->
+    <div class="card">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="chart-title mb-0">Derniers joueurs</h3>
+        <a href="/players" class="text-sm text-primary-400 hover:text-primary-300 transition-colors">Voir tous →</a>
+      </div>
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th>Joueur</th><th>Poste</th><th>Équipe</th><th>Nationalité</th><th>Âge</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of recentPlayers(); track p.id) {
+            <tr>
+              <td>
+                <div class="player-cell">
+                  <div class="av">{{ p.firstName[0] }}{{ p.lastName[0] }}</div>
+                  <span>{{ p.firstName }} {{ p.lastName }}</span>
+                </div>
+              </td>
+              <td><span class="badge-blue">{{ p.position?.name ?? '—' }}</span></td>
+              <td class="text-slate-300">{{ p.team?.name ?? '—' }}</td>
+              <td class="text-slate-300">{{ p.country?.name ?? '—' }}</td>
+              <td class="text-slate-400">{{ getAge(p.birthdate) }} ans</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

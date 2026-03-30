@@ -1,0 +1,26 @@
+.back-link {
+  display: inline-block; font-size: 0.875rem; color: var(--color-text-muted);
+  text-decoration: none; margin-bottom: 0.75rem; transition: color 0.15s;
+  &:hover { color: var(--color-accent); }
+}
+.detail-grid {
+  display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; align-items: start;
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+.profile-card { text-align: center; }
+.player-av-lg {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; font-weight: 800; color: white; margin: 0 auto;
+}
+.profile-card h2 { font-size: 1.25rem; font-weight: 700; color: white; margin: 0.75rem 0 0.5rem; }
+.info-list { margin-top: 1.5rem; text-align: left; }
+.info-row {
+  display: flex; justify-content: space-between; padding: 0.625rem 0;
+  border-bottom: 1px solid var(--color-border); font-size: 0.875rem;
+  &:last-child { border-bottom: none; }
+  span { color: var(--color-text-muted); }
+  strong { color: white; }
+}
+.chart-title { font-size: 0.9rem; font-weight: 600; color: var(--color-text); margin: 0 0 1rem; }

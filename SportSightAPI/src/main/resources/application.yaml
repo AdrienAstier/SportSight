@@ -1,14 +1,17 @@
+jwt:
+  # Secret de développement - remplacer en production : openssl rand -base64 64
+  secret: ZGV2LW9ubHktc2VjcmV0LWtleS1mb3Itand0LWF1dGhlbnRpY2F0aW9uLWluLXNwb3J0c2lnaHQ=
+  access-token-expiration: 900000      # 15 minutes (ms)
+  refresh-token-expiration: 604800000  # 7 jours (ms)
+
 spring:
   application:
     name: sportsight-api
-  security:
-    user:
-      name: user
-      password: password
-      roles: USER
-
+  autoconfigure:
+    exclude:
+      - org.springdoc.core.configuration.SpringDocHateoasConfiguration
   datasource:
-    url: jdbc:mysql://localhost:3306/sportsight?useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/sportsight?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver

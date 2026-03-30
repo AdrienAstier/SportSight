@@ -1,0 +1,51 @@
+<div class="page-enter">
+  @if (loading()) {
+    <app-loading-spinner label="Chargement du joueur..." />
+  } @else if (error()) {
+    <div class="card text-center py-12">
+      <p class="text-red-400 mb-4">{{ error() }}</p>
+      <a routerLink="/players" class="btn-ghost">← Retour aux joueurs</a>
+    </div>
+  } @else {
+    <div class="page-header">
+      <a routerLink="/players" class="back-link">← Joueurs</a>
+      <h1>{{ player()!.firstName }} {{ player()!.lastName }}</h1>
+      <p>{{ player()!.position?.name ?? '—' }} · {{ player()!.team?.name ?? '—' }}</p>
+    </div>
+
+    <div class="detail-grid">
+      <!-- Profile card -->
+      <div class="card profile-card">
+        <div class="player-av-lg">{{ player()!.firstName[0] }}{{ player()!.lastName[0] }}</div>
+        <h2>{{ player()!.firstName }} {{ player()!.lastName }}</h2>
+        <span class="badge-blue">{{ player()!.position?.name ?? '—' }}</span>
+
+        <div class="info-list">
+          <div class="info-row"><span>Équipe</span><strong>{{ player()!.team?.name ?? '—' }}</strong></div>
+          <div class="info-row"><span>Nationalité</span><strong>{{ player()!.country?.name ?? '—' }}</strong></div>
+          <div class="info-row"><span>Continent</span><strong>{{ player()!.country?.continent?.name ?? '—' }}</strong></div>
+          <div class="info-row"><span>Âge</span><strong>{{ getAge(player()!.birthdate) }} ans</strong></div>
+          <div class="info-row"><span>Taille</span><strong>{{ player()!.height ? player()!.height + ' cm' : '—' }}</strong></div>
+          <div class="info-row"><span>Poids</span><strong>{{ player()!.weight ? player()!.weight + ' kg' : '—' }}</strong></div>
+          <div class="info-row"><span>Pied préféré</span><strong class="capitalize">{{ player()!.preferredFoot ?? '—' }}</strong></div>
+        </div>
+      </div>
+
+      <!-- Radar chart -->
+      <div class="card">
+        <h3 class="chart-title">Profil physique</h3>
+        <apx-chart
+          [series]="radarSeries()"
+          [chart]="radarOptions().chart"
+          [xaxis]="radarOptions().xaxis"
+          [yaxis]="radarOptions().yaxis"
+          [fill]="radarOptions().fill"
+          [stroke]="radarOptions().stroke"
+          [markers]="radarOptions().markers"
+          [tooltip]="radarOptions().tooltip"
+        />
+        <p class="text-xs text-slate-500 text-center mt-1">* Valeurs normalisées à partir des attributs physiques</p>
+      </div>
+    </div>
+  }
+</div>

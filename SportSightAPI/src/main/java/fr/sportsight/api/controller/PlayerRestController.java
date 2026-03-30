@@ -2,6 +2,8 @@ package fr.sportsight.api.controller;
 
 import fr.sportsight.api.entity.Player;
 import fr.sportsight.api.service.PlayerService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,6 +13,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api")
+@PreAuthorize("isAuthenticated()")
+@SecurityRequirement(name = "bearerAuth")
 class PlayerRestController {
 
     private PlayerService playerService;

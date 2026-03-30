@@ -1,0 +1,7 @@
+<div class="stat-card" [ngClass]="'variant-' + variant()">
+  <p class="stat-title">{{ title() }}</p>
+  <div class="stat-value">{{ value() }}</div>
+  @if (subtitle()) {
+    <p class="stat-subtitle">{{ subtitle() }}</p>
+  }
+</div>

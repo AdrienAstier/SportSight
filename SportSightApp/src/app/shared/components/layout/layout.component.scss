@@ -1,0 +1,38 @@
+.layout-root {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+app-sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 40;
+  transition: width 0.25s ease;
+}
+
+.layout-main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin-left 0.25s ease;
+  overflow-x: hidden;
+}
+
+.layout-content {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.sidebar-collapsed {
+  app-sidebar { width: 72px; }
+  .layout-main { margin-left: 72px; }
+}
+
+@media (max-width: 768px) {
+  .layout-main { margin-left: 0; }
+}
