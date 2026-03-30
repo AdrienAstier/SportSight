@@ -1,0 +1,43 @@
+.back-link {
+  display: inline-block; font-size: 0.875rem; color: var(--color-text-muted);
+  text-decoration: none; margin-bottom: 0.75rem; transition: color 0.15s;
+  &:hover { color: var(--color-accent); }
+}
+.detail-grid {
+  display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; align-items: start;
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
+}
+.matchup-card { padding: 1.5rem; }
+.matchup {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--color-border);
+}
+.team-block { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; flex: 1; }
+.team-av-lg {
+  width: 64px; height: 64px; border-radius: 16px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; font-weight: 800; color: white;
+  &.home { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+  &.away { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+}
+.team-name { font-weight: 700; color: white; font-size: 0.95rem; text-align: center; }
+.team-country { font-size: 0.8rem; color: var(--color-text-muted); }
+.vs-block { flex-shrink: 0; }
+.vs-label {
+  font-size: 1.1rem; font-weight: 800; color: #475569; letter-spacing: 0.1em;
+}
+.info-list { text-align: left; }
+.info-row {
+  display: flex; justify-content: space-between; padding: 0.625rem 0;
+  border-bottom: 1px solid var(--color-border); font-size: 0.875rem;
+  &:last-child { border-bottom: none; }
+  span { color: var(--color-text-muted); }
+  strong { color: white; }
+}
+.chart-title { font-size: 0.9rem; font-weight: 600; color: var(--color-text); margin: 0 0 1.5rem; }
+.placeholder-content {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 3rem 1rem; gap: 1rem; color: #475569;
+  svg { width: 48px; height: 48px; opacity: 0.4; }
+  p { font-size: 0.875rem; color: #64748b; text-align: center; line-height: 1.6; margin: 0; }
+}

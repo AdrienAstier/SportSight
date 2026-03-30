@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 72" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="72" y2="72" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon background (72×72) -->
+  <rect width="72" height="72" rx="16" fill="url(#bg)"/>
+
+  <!-- 2nd place (left) -->
+  <rect x="11" y="32" width="14" height="29" rx="3" fill="white" opacity="0.65"/>
+
+  <!-- 1st place (center) -->
+  <rect x="29" y="20" width="14" height="41" rx="3" fill="white"/>
+
+  <!-- 3rd place (right) -->
+  <rect x="47" y="42" width="14" height="19" rx="3" fill="white" opacity="0.45"/>
+
+  <!-- Wordmark -->
+  <text
+    x="88" y="31"
+    font-family="Inter, system-ui, sans-serif"
+    font-size="22" font-weight="700" letter-spacing="-0.3"
+    fill="#f1f5f9">Sport</text>
+  <text
+    x="89" y="56"
+    font-family="Inter, system-ui, sans-serif"
+    font-size="18" font-weight="300" letter-spacing="3"
+    fill="#93c5fd">SIGHT</text>
+</svg>

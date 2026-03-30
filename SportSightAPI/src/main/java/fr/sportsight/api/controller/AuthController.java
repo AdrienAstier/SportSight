@@ -1,25 +1,27 @@
 package fr.sportsight.api.controller;
 
 import fr.sportsight.api.dto.AuthRequest;
-import fr.sportsight.api.dto.AuthResponse;
-import fr.sportsight.api.dto.RefreshRequest;
 import fr.sportsight.api.dto.RegisterRequest;
+import fr.sportsight.api.dto.UserInfoResponse;
 import fr.sportsight.api.entity.AppUser;
 import fr.sportsight.api.entity.RefreshToken;
 import fr.sportsight.api.repository.AppUserRepository;
+import fr.sportsight.api.service.CookieService;
 import fr.sportsight.api.service.JwtService;
 import fr.sportsight.api.service.RefreshTokenService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
@@ -32,9 +34,13 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final CookieService cookieService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<UserInfoResponse> register(
+            @Valid @RequestBody RegisterRequest request,
+            HttpServletResponse response
+    ) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Nom d'utilisateur déjà pris");
         }
@@ -46,46 +52,94 @@ public class AuthController {
                 .build();
         userRepository.save(user);
 
-        String accessToken = jwtService.generateAccessToken(user);
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+        issueAuthCookies(user, response);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserInfoResponse.builder()
+                .username(user.getUsername())
+                .role(user.getRole())
                 .build());
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
+    public ResponseEntity<UserInfoResponse> login(
+            @Valid @RequestBody AuthRequest request,
+            HttpServletResponse response
+    ) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
 
         AppUser user = userRepository.findByUsername(request.getUsername()).orElseThrow();
+        issueAuthCookies(user, response);
+
+        return ResponseEntity.ok(UserInfoResponse.builder()
+                .username(user.getUsername())
+                .role(user.getRole())
+                .build());
+    }
+
+    /**
+     * Renouvelle l'access token.
+     * Le refresh token est lu depuis le cookie HttpOnly (Path=/auth/refresh).
+     * Le token est systématiquement pivoté (one-time use).
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<Void> refresh(HttpServletRequest request, HttpServletResponse response) {
+        String refreshTokenValue = extractCookieValue(request, "refresh_token");
+        if (refreshTokenValue == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token manquant");
+        }
+
+        RefreshToken rotated = refreshTokenService.verifyAndRotate(refreshTokenValue);
+        String newAccessToken = jwtService.generateAccessToken(rotated.getUser());
+
+        cookieService.setAccessTokenCookie(response, newAccessToken);
+        cookieService.setRefreshTokenCookie(response, rotated.getToken());
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Déconnexion : révoque tous les refresh tokens de l'utilisateur et supprime les cookies.
+     * Fonctionne même si l'access token est expiré (endpoint public) — les cookies sont toujours effacés.
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(Authentication authentication, HttpServletResponse response) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            AppUser user = (AppUser) authentication.getPrincipal();
+            refreshTokenService.revokeAllForUser(user);
+        }
+        cookieService.clearAuthCookies(response);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Retourne les informations de l'utilisateur authentifié.
+     * Utilisé par le frontend au démarrage pour restaurer la session depuis le cookie.
+     */
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserInfoResponse> me(Authentication authentication) {
+        AppUser user = (AppUser) authentication.getPrincipal();
+        return ResponseEntity.ok(UserInfoResponse.builder()
+                .username(user.getUsername())
+                .role(user.getRole())
+                .build());
+    }
+
+    private void issueAuthCookies(AppUser user, HttpServletResponse response) {
         String accessToken = jwtService.generateAccessToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
-
-        return ResponseEntity.ok(AuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
-                .build());
+        cookieService.setAccessTokenCookie(response, accessToken);
+        cookieService.setRefreshTokenCookie(response, refreshToken.getToken());
     }
 
-    @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request) {
-        RefreshToken refreshToken = refreshTokenService.verifyToken(request.getRefreshToken());
-        AppUser user = refreshToken.getUser();
-        String newAccessToken = jwtService.generateAccessToken(user);
-
-        return ResponseEntity.ok(AuthResponse.builder()
-                .accessToken(newAccessToken)
-                .refreshToken(refreshToken.getToken())
-                .build());
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@Valid @RequestBody RefreshRequest request) {
-        refreshTokenService.revokeToken(request.getRefreshToken());
-        return ResponseEntity.noContent().build();
+    private String extractCookieValue(HttpServletRequest request, String name) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) return null;
+        for (Cookie cookie : cookies) {
+            if (name.equals(cookie.getName())) return cookie.getValue();
+        }
+        return null;
     }
 }

@@ -4,31 +4,28 @@ import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
+/**
+ * Intercepteur d'authentification basé sur les cookies.
+ *
+ * - Ajoute `withCredentials: true` sur toutes les requêtes pour que le navigateur
+ *   envoie automatiquement les cookies HttpOnly (access_token, refresh_token).
+ * - Sur une réponse 401 (token expiré) : tente un refresh transparent, puis rejoue la requête.
+ * - Si le refresh échoue : redirige vers la page de login.
+ */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (req.url.includes('/auth/')) {
-    return next(req);
-  }
+  const credentialsReq = req.clone({ withCredentials: true });
 
-  const token = authService.getAccessToken();
-  const cloned = token
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-    : req;
-
-  return next(cloned).pipe(
+  return next(credentialsReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
+      // Ne pas tenter de refresh sur les endpoints d'auth eux-mêmes
+      if (error.status === 401 && !req.url.includes('/auth/')) {
         return authService.refreshToken().pipe(
-          switchMap((res) => {
-            const retried = req.clone({
-              setHeaders: { Authorization: `Bearer ${res.accessToken}` },
-            });
-            return next(retried);
-          }),
+          switchMap(() => next(credentialsReq)),
           catchError(() => {
-            router.navigate(['/auth/login']);
+            void router.navigate(['/auth/login']);
             return throwError(() => error);
           })
         );

@@ -47,6 +47,25 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
+    /**
+     * Vérifie le token et pivote (one-time use) : invalide l'ancien, crée un nouveau.
+     * Protège contre le re-use d'un refresh token volé.
+     */
+    @Transactional
+    public RefreshToken verifyAndRotate(String token) {
+        RefreshToken existing = verifyToken(token);
+        return createRefreshToken(existing.getUser());
+    }
+
+    /**
+     * Révoque tous les refresh tokens d'un utilisateur.
+     * Appelé lors du logout pour invalider toutes les sessions actives.
+     */
+    @Transactional
+    public void revokeAllForUser(AppUser user) {
+        refreshTokenRepository.deleteByUser(user);
+    }
+
     @Transactional
     public void revokeToken(String token) {
         refreshTokenRepository.findByToken(token).ifPresent(rt -> {

@@ -1,0 +1,55 @@
+<div class="page-enter">
+  @if (loading()) {
+    <app-loading-spinner label="Chargement du match..." />
+  } @else if (error()) {
+    <div class="card text-center py-12">
+      <p class="text-red-400 mb-4">{{ error() }}</p>
+      <a routerLink="/matches" class="btn-ghost">← Retour aux matchs</a>
+    </div>
+  } @else {
+    <div class="page-header">
+      <a routerLink="/matches" class="back-link">← Matchs</a>
+      <h1>{{ match()!.homeTeam?.name }} vs {{ match()!.awayTeam?.name }}</h1>
+      <p>{{ match()!.competition?.name ?? '—' }} · {{ match()!.season?.name ?? '—' }}</p>
+    </div>
+
+    <div class="detail-grid">
+      <!-- Matchup card -->
+      <div class="card matchup-card">
+        <div class="matchup">
+          <div class="team-block">
+            <div class="team-av-lg home">{{ match()!.homeTeam?.name?.[0] ?? '?' }}</div>
+            <span class="team-name">{{ match()!.homeTeam?.name ?? '—' }}</span>
+            <span class="team-country">{{ match()!.homeTeam?.country?.name ?? '—' }}</span>
+          </div>
+          <div class="vs-block">
+            <span class="vs-label">VS</span>
+          </div>
+          <div class="team-block">
+            <div class="team-av-lg away">{{ match()!.awayTeam?.name?.[0] ?? '?' }}</div>
+            <span class="team-name">{{ match()!.awayTeam?.name ?? '—' }}</span>
+            <span class="team-country">{{ match()!.awayTeam?.country?.name ?? '—' }}</span>
+          </div>
+        </div>
+
+        <div class="info-list">
+          <div class="info-row"><span>Compétition</span><strong>{{ match()!.competition?.name ?? '—' }}</strong></div>
+          <div class="info-row"><span>Saison</span><strong>{{ match()!.season?.name ?? '—' }}</strong></div>
+          <div class="info-row"><span>Stade</span><strong>{{ match()!.stadium?.name ?? '—' }}</strong></div>
+          <div class="info-row"><span>Date</span><strong class="capitalize">{{ formatDate(match()!.date) }}</strong></div>
+        </div>
+      </div>
+
+      <!-- Stats placeholder -->
+      <div class="card stats-placeholder">
+        <h3 class="chart-title">Statistiques du match</h3>
+        <div class="placeholder-content">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          <p>Les statistiques détaillées (possession, tirs, passes...)<br>seront disponibles prochainement.</p>
+        </div>
+      </div>
+    </div>
+  }
+</div>

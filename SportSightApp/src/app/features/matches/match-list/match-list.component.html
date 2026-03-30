@@ -1,0 +1,88 @@
+<div class="page-enter">
+  <div class="page-header">
+    <h1>Matchs</h1>
+    <p>{{ filteredMatches().length }} match(s) trouvé(s)</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="card filters-bar mb-6">
+    <div class="filters-grid">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" class="input pl-10" placeholder="Rechercher une équipe, stade, compétition..."
+          [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" />
+      </div>
+      <select class="input" [ngModel]="selectedCompetition()" (ngModelChange)="selectedCompetition.set($event)">
+        <option value="">Toutes les compétitions</option>
+        @for (c of competitions(); track c) { <option [value]="c">{{ c }}</option> }
+      </select>
+      <select class="input" [ngModel]="selectedSeason()" (ngModelChange)="selectedSeason.set($event)">
+        <option value="">Toutes les saisons</option>
+        @for (s of seasons(); track s) { <option [value]="s">{{ s }}</option> }
+      </select>
+      @if (searchQuery() || selectedCompetition() || selectedSeason()) {
+        <button class="btn-ghost" (click)="clearFilters()">Réinitialiser</button>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading-spinner label="Chargement des matchs..." />
+  } @else if (error()) {
+    <div class="card text-center py-12">
+      <p class="text-red-400">{{ error() }}</p>
+    </div>
+  } @else if (filteredMatches().length === 0) {
+    <div class="card text-center py-12">
+      <p class="text-slate-400 mb-3">Aucun match ne correspond aux filtres</p>
+      <button class="btn-ghost" (click)="clearFilters()">Effacer les filtres</button>
+    </div>
+  } @else {
+    <div class="card">
+      <table class="table-base">
+        <thead>
+          <tr>
+            <th>Domicile</th>
+            <th class="text-center">vs</th>
+            <th>Extérieur</th>
+            <th>Compétition</th>
+            <th>Saison</th>
+            <th>Stade</th>
+            <th>Date</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of filteredMatches(); track m.id) {
+            <tr>
+              <td>
+                <div class="team-cell">
+                  <div class="team-av">{{ m.homeTeam?.name?.[0] ?? '?' }}</div>
+                  <span class="font-medium text-white">{{ m.homeTeam?.name ?? '—' }}</span>
+                </div>
+              </td>
+              <td class="text-center">
+                <span class="vs-badge">VS</span>
+              </td>
+              <td>
+                <div class="team-cell">
+                  <div class="team-av away">{{ m.awayTeam?.name?.[0] ?? '?' }}</div>
+                  <span class="font-medium text-white">{{ m.awayTeam?.name ?? '—' }}</span>
+                </div>
+              </td>
+              <td><span class="badge-blue">{{ m.competition?.name ?? '—' }}</span></td>
+              <td class="text-slate-300">{{ m.season?.name ?? '—' }}</td>
+              <td class="text-slate-400">{{ m.stadium?.name ?? '—' }}</td>
+              <td class="text-slate-400">{{ formatDate(m.date) }}</td>
+              <td>
+                <a [routerLink]="['/matches', m.id]" class="btn-ghost text-xs py-1 px-2">Voir →</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
